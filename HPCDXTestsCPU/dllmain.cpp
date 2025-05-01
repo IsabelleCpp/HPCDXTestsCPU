@@ -6,11 +6,24 @@ int getDevMenu()
 {
     uintptr_t Result;
 
-    if (!FindPattern(&Result, "48 89 5C 24 08 48 89 7C 24 10 45 33 D2 4C 8B", 0))
+    if (!FindPattern(&Result, "48 8B 05 ?? ?? ?? ?? C5 ?? ?? ?? ?? ?? ?? ?? C5 ?? ?? ?? ?? ?? ?? ?? C5 ?? ?? ?? ?? ?? ?? ?? 4C", 0))
         return -1;
 	DevMenuAddr = Result;
 	return 0;
 }
+
+void AllocateConsole()
+{
+    // Allocate a console
+    if (AllocConsole())
+    {
+        // Redirect standard output to the console
+        FILE* fileStream;
+        freopen_s(&fileStream, "CONOUT$", "w", stdout);
+        std::cout.clear(); // Clear any error flags on std::cout
+    }
+}
+
 BOOL APIENTRY DllMain( HMODULE hModule,
                        DWORD  ul_reason_for_call,
                        LPVOID lpReserved
@@ -22,9 +35,11 @@ BOOL APIENTRY DllMain( HMODULE hModule,
     case DLL_PROCESS_ATTACH:
 		if(getDevMenu() == -1)
 		{
-			MessageBoxA(0, "Failed to find DevMenu pattern", "Error", MB_ICONERROR);
+            Beep(666, 1000);
+			//MessageBoxA(0, "Failed to find DevMenu pattern", "Error", MB_ICONERROR);
 			return FALSE;
 		}
+		AllocateConsole();
         globals::mainModule = hModule;
         hooks::Init();
         break;

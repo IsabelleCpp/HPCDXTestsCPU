@@ -11,6 +11,8 @@
 #include "framework.h"
 #include <string>
 #include <vector>
+#include <iostream>
+#include <fstream>
 struct Vector_Type1 {
     size_t index;
     BYTE Byte;

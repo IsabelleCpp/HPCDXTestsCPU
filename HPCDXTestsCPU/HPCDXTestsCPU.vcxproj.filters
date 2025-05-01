@@ -31,6 +31,18 @@
     <Filter Include="Source Files\imgui">
       <UniqueIdentifier>{b756602a-75c7-4dd7-a090-f5fbd2beb169}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\ntdll">
+      <UniqueIdentifier>{5f21e60b-0368-46d9-8f01-829f5395971f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\ntdll">
+      <UniqueIdentifier>{77a7a2f1-801c-405b-9343-94e9924b75d0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\KernelBase">
+      <UniqueIdentifier>{1b5decd3-74ca-4ca3-9000-a81a3f12157e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\KernelBase">
+      <UniqueIdentifier>{da44ba9c-9a50-4f96-b081-e1612412e376}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="framework.h">
@@ -96,6 +108,18 @@
     <ClInclude Include="namespaces.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="ntdll.h">
+      <Filter>Header Files\ntdll</Filter>
+    </ClInclude>
+    <ClInclude Include="KernelBase.h">
+      <Filter>Header Files\KernelBase</Filter>
+    </ClInclude>
+    <ClInclude Include="KernelBaseInternal.h">
+      <Filter>Header Files\KernelBase</Filter>
+    </ClInclude>
+    <ClInclude Include="ntdll_internal.h">
+      <Filter>Header Files\ntdll</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">
@@ -157,6 +181,12 @@
     </ClCompile>
     <ClCompile Include="globals.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ntdll.cpp">
+      <Filter>Source Files\ntdll</Filter>
+    </ClCompile>
+    <ClCompile Include="KernelBase.cpp">
+      <Filter>Source Files\KernelBase</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

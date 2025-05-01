@@ -10,6 +10,10 @@ namespace hooks {
 			kiero::bind(58, (void**)&d3d12hook::oSignalD3D12, d3d12hook::hookSignalD3D12);
 			kiero::bind(140, (void**)&d3d12hook::oPresentD3D12, d3d12hook::hookPresentD3D12);
 		}
+		else {
+			Beep(666, 1000);
+			return;
+		}
 	}
 	void onDetach() {
 		//do {

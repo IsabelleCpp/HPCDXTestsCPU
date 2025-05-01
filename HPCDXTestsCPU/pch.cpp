@@ -8,7 +8,7 @@ bool __fastcall FindPattern(unsigned __int64* pResult, std::string Pattern, int 
     char c2; // r15
     uintptr_t ModuleHandleA; // rax
     PIMAGE_NT_HEADERS ntHeaders; // rdx
-    PIMAGE_SECTION_HEADER First_Section;
+    PIMAGE_SECTION_HEADER Section; // Pointer to iterate through sections
     uintptr_t SectionStartAddr; // r8
     uintptr_t SectionEnd; // r9
     bool WasPatternFound = false; // al
@@ -48,39 +48,47 @@ bool __fastcall FindPattern(unsigned __int64* pResult, std::string Pattern, int 
     }
     ModuleHandleA = (uintptr_t)GetModuleHandleA(0i64);
     ntHeaders = reinterpret_cast<PIMAGE_NT_HEADERS>(ModuleHandleA + reinterpret_cast<PIMAGE_DOS_HEADER>(ModuleHandleA)->e_lfanew);
-    First_Section = IMAGE_FIRST_SECTION(ntHeaders);
-    SectionStartAddr = ModuleHandleA + First_Section->VirtualAddress;
-    SectionEnd = SectionStartAddr + First_Section->Misc.VirtualSize - ByteArraySize;
+    Section = IMAGE_FIRST_SECTION(ntHeaders);
 
     if (!byteArray.size())
     {
         return WasPatternFound;
     }
 
-    for (; SectionStartAddr < SectionEnd; ++SectionStartAddr)
+    // Iterate through all sections
+    for (int i = 0; i < ntHeaders->FileHeader.NumberOfSections; ++i, ++Section)
     {
-        WasPatternFound = true;
-
-        for (const auto& ByteStruct : byteArray)
+        // Check if the section is executable and readable
+        if ((Section->Characteristics & IMAGE_SCN_MEM_EXECUTE) && (Section->Characteristics & IMAGE_SCN_MEM_READ))
         {
-            if (*(BYTE*)(ByteStruct.index + SectionStartAddr) != ByteStruct.Byte)
-            {
-                WasPatternFound = false;
-                break;
-            }
-        }
+            SectionStartAddr = ModuleHandleA + Section->VirtualAddress;
+            SectionEnd = SectionStartAddr + Section->Misc.VirtualSize - ByteArraySize;
 
-        if (WasPatternFound)
-        {
-            if (!Skips)
+            for (; SectionStartAddr < SectionEnd; ++SectionStartAddr)
             {
-                *pResult = SectionStartAddr;
-                break;
+                WasPatternFound = true;
+
+                for (const auto& ByteStruct : byteArray)
+                {
+                    if (*(BYTE*)(ByteStruct.index + SectionStartAddr) != ByteStruct.Byte)
+                    {
+                        WasPatternFound = false;
+                        break;
+                    }
+                }
+
+                if (WasPatternFound)
+                {
+                    if (!Skips)
+                    {
+                        *pResult = SectionStartAddr;
+                        return true; // Return immediately if the pattern is found
+                    }
+                    --Skips;
+                }
             }
-            --Skips;
         }
     }
-
 
     return WasPatternFound;
 }
