@@ -1,5 +1,16 @@
 #include "KernelBaseInternal.h"
-#include "ntdll.h"
+#include "KernelBaseInternalFuncs.h"
+#include "ntdll_internal_funcs.h"
+
+_PEB* NtCurrentPeb() {
+#ifdef _M_X64
+    return (_PEB*)(__readgsqword(0x60));
+#elif _M_IX86
+    return (_PEB*)(__readfsdword(0x30));
+#else
+#error "NtCurrentPeb architecture is not unsupported"
+#endif
+}
 
 __int64 __fastcall BaseSetLastNTError(NTSTATUS a1)
 {

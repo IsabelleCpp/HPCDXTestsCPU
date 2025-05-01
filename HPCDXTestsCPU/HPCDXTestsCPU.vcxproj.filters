@@ -120,6 +120,12 @@
     <ClInclude Include="ntdll_internal.h">
       <Filter>Header Files\ntdll</Filter>
     </ClInclude>
+    <ClInclude Include="KernelBaseInternalFuncs.h">
+      <Filter>Header Files\KernelBase</Filter>
+    </ClInclude>
+    <ClInclude Include="ntdll_internal_funcs.h">
+      <Filter>Header Files\ntdll</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">

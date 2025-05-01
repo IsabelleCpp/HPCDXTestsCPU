@@ -1,5 +1,4 @@
 #pragma once
-#include "intrin.h"
 struct _GENERIC_MAPPING;
 struct _nlsversioninfo;
 struct _OVERLAPPED;
@@ -3021,20 +3020,3 @@ struct StateLock;
 
 /* 527 */
 struct ZuneMusicRepairer;
-
-inline _PEB* NtCurrentPeb() {
-#ifdef _M_X64
-    return (_PEB*)(__readgsqword(0x60));
-#elif _M_IX86
-    return (_PEB*)(__readfsdword(0x30));
-#else
-#error "NtCurrentPeb architecture is not unsupported"
-#endif
-}
-
-NTSTATUS __fastcall Basep8BitStringToDynamicUnicodeString(
-    struct _UNICODE_STRING* DstStringUnicodeString,
-    const char* SourceString);
-HMODULE __stdcall GetModuleHandleA_EAC(LPCSTR lpModuleName);
-HMODULE __stdcall GetModuleHandleW_EAC(LPCWSTR lpModuleName);
-__int64 __fastcall BaseSetLastNTError(NTSTATUS a1);
