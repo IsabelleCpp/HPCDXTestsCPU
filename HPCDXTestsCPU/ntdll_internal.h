@@ -13599,15 +13599,6 @@ struct _PF_KERNEL_GLOBALS
 /* 1142 */
 typedef __crt_locale_pointers* _locale_t;
 
-/* 1143 */
-#pragma pack(push, 8)
-struct __crt_locale_pointers
-{
-    struct __crt_locale_data* locinfo;
-    struct __crt_multibyte_data* mbcinfo;
-};
-#pragma pack(pop)
-
 /* 1144 */
 typedef struct _GUID GUID;
 

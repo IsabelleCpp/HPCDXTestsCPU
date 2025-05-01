@@ -126,6 +126,9 @@
     <ClInclude Include="ntdll_internal_funcs.h">
       <Filter>Header Files\ntdll</Filter>
     </ClInclude>
+    <ClInclude Include="defs.h">
+      <Filter>Header Files\ntdll</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">
