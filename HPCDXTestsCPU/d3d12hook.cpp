@@ -53,11 +53,13 @@ namespace d3d12hook {
 	long __fastcall hookPresentD3D12(IDXGISwapChain3* pSwapChain, UINT SyncInterval, UINT Flags) {
 		static bool init = false;
 
-		if (GetAsyncKeyState(globals::openMenuKey) & 0x1) {
-			menu::isOpen ? menu::isOpen = false : menu::isOpen = true;
+		if (inputhook::VkStatesArray[globals::openMenuKey].TickCountWhenPressed && !inputhook::VkStatesArray[globals::openMenuKey].wasDownBefore && !inputhook::VkStatesArray[globals::openMenuKey].isUpNow) {
+			inputhook::VkStatesArray[globals::openMenuKey] = VirtualKeyDataEntry{ 0 };
+			menu::isOpen = !menu::isOpen;
 		}
 
-		if (GetAsyncKeyState(globals::uninjectKey) & 0x1) {
+		if (inputhook::VkStatesArray[globals::uninjectKey].TickCountWhenPressed && !inputhook::VkStatesArray[globals::uninjectKey].wasDownBefore && !inputhook::VkStatesArray[globals::uninjectKey].isUpNow) {
+			inputhook::VkStatesArray[globals::uninjectKey] = VirtualKeyDataEntry{ 0 };
 			hooks::release();
 			return oPresentD3D12(pSwapChain, SyncInterval, Flags);
 		}
@@ -222,11 +224,8 @@ namespace d3d12hook {
 
 	void release() {
 		shutdown = true;
-		d3d12Device->Release();
 		d3d12DescriptorHeapBackBuffers->Release();
 		d3d12DescriptorHeapImGuiRender->Release();
 		d3d12CommandList->Release();
-		d3d12Fence->Release();
-		d3d12CommandQueue->Release();
 	}
 }

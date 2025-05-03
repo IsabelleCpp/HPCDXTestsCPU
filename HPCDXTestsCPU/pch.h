@@ -7,6 +7,13 @@
 #include <iostream>
 #include <fstream>
 #include <sstream>
+struct VirtualKeyDataEntry
+{
+	ULONGLONG TickCountWhenPressed;
+	DWORD isWithAlt;
+	DWORD wasDownBefore;
+	DWORD isUpNow;
+};
 bool __fastcall FindPattern(unsigned __int64* pResult, std::string Pattern, int Skips, HMODULE moduleBase = nullptr);
 
 #include <dxgi.h>
