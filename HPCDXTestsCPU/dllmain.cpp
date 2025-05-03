@@ -20,7 +20,6 @@ void AllocateConsole()
         // Redirect standard output to the console
         FILE* fileStream;
         freopen_s(&fileStream, "CONOUT$", "w", stdout);
-        std::cout.clear(); // Clear any error flags on std::cout
     }
 }
 
@@ -39,7 +38,6 @@ BOOL APIENTRY DllMain( HMODULE hModule,
 			//MessageBoxA(0, "Failed to find DevMenu pattern", "Error", MB_ICONERROR);
 			return FALSE;
 		}
-		AllocateConsole();
         globals::mainModule = hModule;
         hooks::Init();
         break;
