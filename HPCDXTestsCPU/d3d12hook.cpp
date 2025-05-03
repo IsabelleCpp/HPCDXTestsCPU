@@ -159,6 +159,7 @@ namespace d3d12hook {
 					commandQueue->Release();
 				}
 			}
+			menu::getDevMenu();
 			init = true;
 		}
 

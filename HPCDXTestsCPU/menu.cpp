@@ -3,6 +3,27 @@
 namespace menu {
 	bool isOpen = true;
 	float test = 0.f;
+	uintptr_t DevMenuAddr = 0x0;
+	int getDevMenu()
+	{
+		uintptr_t Result;
+
+		if (!FindPattern(&Result, "48 8B 05 ?? ?? ?? ?? C5 ?? ?? ?? ?? ?? ?? ?? C5 ?? ?? ?? ?? ?? ?? ?? C5 ?? ?? ?? ?? ?? ?? ?? 4C", 0))
+			return -1;
+		DevMenuAddr = Result;
+		return 0;
+	}
+
+	void AllocateConsole()
+	{
+		// Allocate a console
+		if (AllocConsole())
+		{
+			// Redirect standard output to the console
+			FILE* fileStream;
+			freopen_s(&fileStream, "CONOUT$", "w", stdout);
+		}
+	}
 
 	void Init() {
 		static bool no_titlebar = false;

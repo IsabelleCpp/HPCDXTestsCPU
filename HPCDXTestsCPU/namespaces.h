@@ -35,4 +35,5 @@ namespace d3d12hook {
 namespace menu {
 	extern bool isOpen;
 	extern void Init();
+	int getDevMenu();
 }
