@@ -1,7 +1,7 @@
 // pch.cpp: source file corresponding to the pre-compiled header
 
 #include "pch.h"
-bool __fastcall FindPattern(unsigned __int64* pResult, std::string Pattern, int Skips)
+bool __fastcall FindPattern(unsigned __int64* pResult, std::string Pattern, int Skips, HMODULE moduleBase)
 {
     size_t ByteArraySize; // eax
     char c1; // r12
@@ -46,7 +46,15 @@ bool __fastcall FindPattern(unsigned __int64* pResult, std::string Pattern, int 
             byteArray.push_back(ByteData);
         }
     }
-    ModuleHandleA = (uintptr_t)GetModuleHandleA(0i64);
+	if (moduleBase)
+	{
+		ModuleHandleA = (uintptr_t)moduleBase;
+	}
+	else
+	{
+		// Get the base address of the current module
+		ModuleHandleA = (uintptr_t)GetModuleHandleA(0);
+	}
     ntHeaders = reinterpret_cast<PIMAGE_NT_HEADERS>(ModuleHandleA + reinterpret_cast<PIMAGE_DOS_HEADER>(ModuleHandleA)->e_lfanew);
     Section = IMAGE_FIRST_SECTION(ntHeaders);
 

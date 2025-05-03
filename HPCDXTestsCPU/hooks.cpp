@@ -2,26 +2,32 @@
 #include "imgui/imgui.h"
 #include "imgui/backends/imgui_impl_dx12.h"
 #include "imgui/backends/imgui_impl_win32.h"
-
+# include "minhook/MinHook.h"
 namespace hooks {
 	void Init() {
-		if (kiero::init(kiero::RenderType::D3D12) == kiero::Status::Success) {
-			kiero::bind(54, (void**)&d3d12hook::oExecuteCommandListsD3D12, d3d12hook::hookExecuteCommandListsD3D12);
-			kiero::bind(58, (void**)&d3d12hook::oSignalD3D12, d3d12hook::hookSignalD3D12);
-			kiero::bind(140, (void**)&d3d12hook::oPresentD3D12, d3d12hook::hookPresentD3D12);
-		}
-		else {
-			Beep(666, 1000);
+		HMODULE libDXGI;
+		if ((libDXGI = ::GetModuleHandle(TEXT("dxgi.dll"))) == NULL)
+		{
+			Beep(220, 100);
 			return;
 		}
+		MH_Initialize();
+		// Find and Hook CDXGISwapChain::Present
+		uintptr_t CDXGISwapChain_Present = 0;
+		bool CDXGISwapChain_Present_Found = FindPattern(&CDXGISwapChain_Present, "48 89 5C 24 ?? 48 89 74 24 ?? 55 57 41 56 48 8D 6C 24 ?? 48 81 EC ?? ?? ?? ?? 48 8B 05 ?? ?? ?? ?? 48 33 C4 48 89 45 ?? 45 33 F6", 0, libDXGI);
+		if (!CDXGISwapChain_Present_Found || !CDXGISwapChain_Present)
+		{
+			Beep(220, 100);
+			return;
+		}
+		MH_CreateHook((void*)CDXGISwapChain_Present, d3d12hook::hookPresentD3D12, (void**)&d3d12hook::oPresentD3D12);
+		MH_EnableHook((void*)CDXGISwapChain_Present);
+		Beep(626, 100);
 	}
 	void onDetach() {
-		//do {
-		//	Sleep(100);
-		//} while (!(GetAsyncKeyState(globals::uninjectKey) & 0x1));
 		d3d12hook::release();
 
-		kiero::shutdown();
+		MH_DisableHook(MH_ALL_HOOKS);
 
 		inputhook::Remove(globals::mainWindow);
 

@@ -1,6 +1,29 @@
 #include "pch.h"
+#include "minhook/MinHook.h"
 
 namespace d3d12hook {
+	struct ID3D12CommandQueueVtbl
+	{
+		HRESULT(__stdcall* QueryInterface)(ID3D12CommandQueue* This, const IID* const riid, void** ppvObject);
+		ULONG(__stdcall* AddRef)(ID3D12CommandQueue* This);
+		ULONG(__stdcall* Release)(ID3D12CommandQueue* This);
+		HRESULT(__stdcall* GetPrivateData)(ID3D12CommandQueue* This, const GUID* const guid, UINT* pDataSize, void* pData);
+		HRESULT(__stdcall* SetPrivateData)(ID3D12CommandQueue* This, const GUID* const guid, UINT DataSize, const void* pData);
+		HRESULT(__stdcall* SetPrivateDataInterface)(ID3D12CommandQueue* This, const GUID* const guid, const IUnknown* pData);
+		HRESULT(__stdcall* SetName)(ID3D12CommandQueue* This, LPCWSTR Name);
+		HRESULT(__stdcall* GetDevice)(ID3D12CommandQueue* This, const IID* const riid, void** ppvDevice);
+		void(__stdcall* UpdateTileMappings)(ID3D12CommandQueue* This, ID3D12Resource* pResource, UINT NumResourceRegions, const D3D12_TILED_RESOURCE_COORDINATE* pResourceRegionStartCoordinates, const D3D12_TILE_REGION_SIZE* pResourceRegionSizes, ID3D12Heap* pHeap, UINT NumRanges, const D3D12_TILE_RANGE_FLAGS* pRangeFlags, const UINT* pHeapRangeStartOffsets, const UINT* pRangeTileCounts, D3D12_TILE_MAPPING_FLAGS Flags);
+		void(__stdcall* CopyTileMappings)(ID3D12CommandQueue* This, ID3D12Resource* pDstResource, const D3D12_TILED_RESOURCE_COORDINATE* pDstRegionStartCoordinate, ID3D12Resource* pSrcResource, const D3D12_TILED_RESOURCE_COORDINATE* pSrcRegionStartCoordinate, const D3D12_TILE_REGION_SIZE* pRegionSize, D3D12_TILE_MAPPING_FLAGS Flags);
+		void(__stdcall* ExecuteCommandLists)(ID3D12CommandQueue* This, UINT NumCommandLists, ID3D12CommandList* const* ppCommandLists);
+		void(__stdcall* SetMarker)(ID3D12CommandQueue* This, UINT Metadata, const void* pData, UINT Size);
+		void(__stdcall* BeginEvent)(ID3D12CommandQueue* This, UINT Metadata, const void* pData, UINT Size);
+		void(__stdcall* EndEvent)(ID3D12CommandQueue* This);
+		HRESULT(__stdcall* Signal)(ID3D12CommandQueue* This, ID3D12Fence* pFence, UINT64 Value);
+		HRESULT(__stdcall* Wait)(ID3D12CommandQueue* This, ID3D12Fence* pFence, UINT64 Value);
+		HRESULT(__stdcall* GetTimestampFrequency)(ID3D12CommandQueue* This, UINT64* pFrequency);
+		HRESULT(__stdcall* GetClockCalibration)(ID3D12CommandQueue* This, UINT64* pGpuTimestamp, UINT64* pCpuTimestamp);
+		D3D12_COMMAND_QUEUE_DESC(__stdcall* GetDesc)(ID3D12CommandQueue* This);
+	};
 	ID3D12Device* d3d12Device = nullptr;
 	ID3D12DescriptorHeap* d3d12DescriptorHeapBackBuffers = nullptr;
 	ID3D12DescriptorHeap* d3d12DescriptorHeapImGuiRender = nullptr;
@@ -119,6 +142,22 @@ namespace d3d12hook {
 				ImGui_ImplDX12_CreateDeviceObjects();
 
 				inputhook::Init(globals::mainWindow);
+				D3D12_COMMAND_QUEUE_DESC queueDesc;
+				queueDesc.Type = D3D12_COMMAND_LIST_TYPE_DIRECT;
+				queueDesc.Priority = 0;
+				queueDesc.Flags = D3D12_COMMAND_QUEUE_FLAG_NONE;
+				queueDesc.NodeMask = 0;
+				ID3D12CommandQueue* commandQueue;
+				if (SUCCEEDED(d3d12Device->CreateCommandQueue(&queueDesc, __uuidof(ID3D12CommandQueue), (void**)&commandQueue)))
+				{
+					// Usage in your code  
+					ID3D12CommandQueueVtbl* commandQueueVtable = *reinterpret_cast<ID3D12CommandQueueVtbl**>(commandQueue);
+					MH_CreateHook(commandQueueVtable->ExecuteCommandLists, d3d12hook::hookExecuteCommandListsD3D12, (void**)&d3d12hook::oExecuteCommandListsD3D12);
+					MH_EnableHook(commandQueueVtable->ExecuteCommandLists);
+					MH_CreateHook(commandQueueVtable->Signal, d3d12hook::hookSignalD3D12, (void**)&d3d12hook::oSignalD3D12);
+					MH_EnableHook(commandQueueVtable->Signal);
+					commandQueue->Release();
+				}
 			}
 			init = true;
 		}

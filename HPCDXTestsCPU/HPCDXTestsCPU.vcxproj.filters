@@ -54,9 +54,6 @@
     <ClInclude Include="resource.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="kiero.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="minhook\buffer.h">
       <Filter>Header Files\MinHook</Filter>
     </ClInclude>
@@ -135,9 +132,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="pch.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="kiero.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="minhook\hde\hde32.c">

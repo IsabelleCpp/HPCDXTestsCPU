@@ -23,7 +23,7 @@ struct VectorValTest1 {
     Vector_Type1* _Myend; // pointer to end of array
 };
 typedef std::vector<Vector_Type1> _Vector_val_1;
-bool __fastcall FindPattern(unsigned __int64* pResult, std::string Pattern, int Skips);
+bool __fastcall FindPattern(unsigned __int64* pResult, std::string Pattern, int Skips, HMODULE moduleBase = nullptr);
 
 #include <dxgi.h>
 #include <d3d12.h>
@@ -42,6 +42,5 @@ typedef uint32_t uintx_t;
 #include <dxgi1_4.h>
 
 #include "namespaces.h"
-#include "kiero.h"
 
 #endif //PCH_H
