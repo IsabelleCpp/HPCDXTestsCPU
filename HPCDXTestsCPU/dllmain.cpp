@@ -180,6 +180,15 @@ LONG VectoredExceptionHander(EXCEPTION_POINTERS* ExceptionInfo)
 	auto ExceptionRecord = ExceptionInfo->ExceptionRecord;
 	auto Context = ExceptionInfo->ContextRecord;
     DWORD code = ExceptionRecord->ExceptionCode;
+
+    // Skip logging for specific exception codes
+    switch (code) {
+    case 0x40010006: // Debugger printed exception on control C
+    case 0x406d1388: // UNKNOWN_EXCEPTION
+    case 0xe06d7363: // UNKNOWN_EXCEPTION
+        return EXCEPTION_CONTINUE_SEARCH;
+    }
+
     PVOID address = ExceptionRecord->ExceptionAddress;
     std::string moduleName;
     ptrdiff_t relativeAddr = 0;
@@ -277,7 +286,7 @@ LONG VectoredExceptionHander(EXCEPTION_POINTERS* ExceptionInfo)
         logFile.close();
     }
 
-	return EXCEPTION_CONTINUE_EXECUTION;
+	return EXCEPTION_CONTINUE_SEARCH;
 }
 
 typedef BOOLEAN(__fastcall* RtlDispatchException_t)(PEXCEPTION_RECORD, PCONTEXT);
