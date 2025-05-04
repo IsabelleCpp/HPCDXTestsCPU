@@ -121,6 +121,27 @@ void VectoredHandler(IN PEXCEPTION_RECORD ExceptionRecord, IN PCONTEXT Context)
     };
     AppendStackTrace();
 
+    // Log register state
+    oss << "Register state:\r\n";
+    oss << "RAX=0x" << std::hex << Context->Rax
+        << " RBX=0x" << Context->Rbx
+        << " RCX=0x" << Context->Rcx
+        << " RDX=0x" << Context->Rdx << "\r\n";
+    oss << "RSI=0x" << Context->Rsi
+        << " RDI=0x" << Context->Rdi
+        << " RBP=0x" << Context->Rbp
+        << " RSP=0x" << Context->Rsp << "\r\n";
+    oss << "R8 =0x" << Context->R8
+        << " R9 =0x" << Context->R9
+        << " R10=0x" << Context->R10
+        << " R11=0x" << Context->R11 << "\r\n";
+    oss << "R12=0x" << Context->R12
+        << " R13=0x" << Context->R13
+        << " R14=0x" << Context->R14
+        << " R15=0x" << Context->R15 << "\r\n";
+    oss << "RIP=0x" << Context->Rip
+        << " EFlags=0x" << Context->EFlags << "\r\n";
+
     // Write to file (atomic append)
     const char* logFilePath = "E:\\Helper\\HPCDXTestsCPU\\x64\\Release\\ExceptionLog.txt";
     std::ofstream logFile(logFilePath, std::ios::app | std::ios::out | std::ios::binary);
