@@ -2,7 +2,6 @@
 
 namespace menu {
 	bool isOpen = true;
-	float test = 0.f;
 	uintptr_t DevMenuAddr = 0x0;
 	int getDevMenu()
 	{
@@ -93,24 +92,8 @@ namespace menu {
 
 		if (isOpen)
 		{
-			ImGui::Begin("ImGui Menu", &isOpen, window_flags);
-
-			ImGui::PushItemWidth(ImGui::GetWindowWidth() * 0.65f);
-			ImGui::PushItemWidth(-140);
-
-			if (ImGui::CollapsingHeader("MENU"))
-			{
-				if (ImGui::TreeNode("SUB MENU"))
-				{
-					ImGui::Text("Text Test");
-					if (ImGui::Button("Button Test")) {}
-					ImGui::Checkbox("CheckBox Test", &no_titlebar);
-					ImGui::SliderFloat("Slider Test", &test, 1.0f, 100.0f);
-
-					ImGui::TreePop();
-				}
-			}
-
+			ImGui::Begin("Menu", &isOpen, window_flags);
+			ImGui::ShowDemoWindow();
 			ImGui::End();
 		}
 	}

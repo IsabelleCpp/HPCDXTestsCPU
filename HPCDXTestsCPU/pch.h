@@ -7,6 +7,7 @@
 #include <iostream>
 #include <fstream>
 #include <sstream>
+#include <iomanip>
 struct VirtualKeyDataEntry
 {
 	ULONGLONG TickCountWhenPressed;
