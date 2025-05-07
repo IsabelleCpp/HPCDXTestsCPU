@@ -9,9 +9,52 @@ namespace menu {
 
 		if (!FindPattern(&Result, "48 8B 05 ?? ?? ?? ?? C5 ?? ?? ?? ?? ?? ?? ?? C5 ?? ?? ?? ?? ?? ?? ?? C5 ?? ?? ?? ?? ?? ?? ?? 4C", 0))
 			return -1;
-		DevMenuAddr = Result;
+		DevMenuAddr = Result + *(DWORD*)(Result + 3) + 7;
 		return 0;
 	}
+
+	bool IsBadReadPtr(void* p)
+	{
+		MEMORY_BASIC_INFORMATION mbi = { 0 };
+		if (::VirtualQuery(p, &mbi, sizeof(mbi)))
+		{
+			DWORD mask = (PAGE_READONLY | PAGE_READWRITE | PAGE_WRITECOPY | PAGE_EXECUTE_READ | PAGE_EXECUTE_READWRITE | PAGE_EXECUTE_WRITECOPY);
+			bool b = !(mbi.Protect & mask);
+			// check the page is not a guard page
+			if (mbi.Protect & (PAGE_GUARD | PAGE_NOACCESS)) b = true;
+
+			return b;
+		}
+		return true;
+	}
+
+	// Safe helper to read a byte at (DevMenuAddr + offset1) + offset2
+	inline uint8_t ReadMenuToggle(uintptr_t offset1, uintptr_t offset2) {
+		uintptr_t ptr1_addr = DevMenuAddr + offset1;
+		if (IsBadReadPtr((void*)ptr1_addr)) return 0;
+		uintptr_t ptr1 = *(uintptr_t*)ptr1_addr;
+		if (IsBadReadPtr((void*)(ptr1 + offset2))) return 0;
+		return *(uint8_t*)(ptr1 + offset2);
+	}
+
+	// Safe helper to write a byte at (DevMenuAddr + offset1) + offset2
+	inline void WriteMenuToggle(uintptr_t offset1, uintptr_t offset2, uint8_t value) {
+		uintptr_t ptr1_addr = DevMenuAddr + offset1;
+		if (IsBadReadPtr((void*)ptr1_addr)) return;
+		uintptr_t ptr1 = *(uintptr_t*)ptr1_addr;
+		if (IsBadReadPtr((void*)(ptr1 + offset2))) return;
+		*(uint8_t*)(ptr1 + offset2) = value;
+	}
+
+	// Specific helpers for each menu
+	inline bool GetDevMenuEnabled() { return ReadMenuToggle(0x80, 0xC0) != 0; }
+	inline void SetDevMenuEnabled(bool enable) { WriteMenuToggle(0x80, 0xC0, enable ? 1 : 0); }
+
+	inline bool GetQuickMenuEnabled() { return ReadMenuToggle(0x78, 0xC0) != 0; }
+	inline void SetQuickMenuEnabled(bool enable) { WriteMenuToggle(0x78, 0xC0, enable ? 1 : 0); }
+
+	inline bool GetFavoritesMenuEnabled() { return ReadMenuToggle(0x88, 0xC0) != 0; }
+	inline void SetFavoritesMenuEnabled(bool enable) { WriteMenuToggle(0x88, 0xC0, enable ? 1 : 0); }
 
 	void AllocateConsole()
 	{
@@ -23,7 +66,15 @@ namespace menu {
 			freopen_s(&fileStream, "CONOUT$", "w", stdout);
 		}
 	}
-
+	void CloseConsole()
+	{
+		// Free the console
+		if (FreeConsole())
+		{
+			// Close the standard output
+			fclose(stdout);
+		}
+	}
 	void Init() {
 		static bool no_titlebar = false;
 		static bool no_border = true;
@@ -93,7 +144,44 @@ namespace menu {
 		if (isOpen)
 		{
 			ImGui::Begin("Menu", &isOpen, window_flags);
-			ImGui::ShowDemoWindow();
+			// Dev Menu Toggle
+			{
+				bool devMenu = menu::GetDevMenuEnabled();
+				if (ImGui::Checkbox("Show Dev Menu", &devMenu)) {
+					menu::SetDevMenuEnabled(devMenu);
+				}
+			}
+
+			// Quick Menu Toggle
+			{
+				bool quickMenu = menu::GetQuickMenuEnabled();
+				if (ImGui::Checkbox("Show Quick Menu", &quickMenu)) {
+					menu::SetQuickMenuEnabled(quickMenu);
+				}
+			}
+
+			// Favorites Menu Toggle
+			{
+				bool favMenu = menu::GetFavoritesMenuEnabled();
+				if (ImGui::Checkbox("Show Favorites Menu", &favMenu)) {
+					menu::SetFavoritesMenuEnabled(favMenu);
+				}
+			}
+			// Uninject
+			if (ImGui::Button("Uninject"))
+			{
+				hooks::release();
+			}
+			// Allocate Console
+			if (ImGui::Button("Allocate Console"))
+			{
+				AllocateConsole();
+			}
+			// Close Console
+			if (ImGui::Button("Close Console"))
+			{
+				CloseConsole();
+			}
 			ImGui::End();
 		}
 	}
