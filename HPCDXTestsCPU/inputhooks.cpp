@@ -57,10 +57,6 @@ namespace inputhook {
 			}
         }
 
-		if (menu::isOpen) {
-			ImGui_ImplWin32_WndProcHandler(hwnd, uMsg, wParam, lParam);
-			return true;
-		}
 		return CallWindowProc(oWndProc, hwnd, uMsg, wParam, lParam);
 	}
 }

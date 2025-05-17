@@ -4,7 +4,9 @@ namespace globals {
 	extern HMODULE mainModule;
 	extern HWND mainWindow;
 	extern int uninjectKey;
-	extern int openMenuKey;
+	extern int openQuickMenuKey;
+	extern int openDevMenuKey;
+	extern int openFavoritesMenuKey;
 }
 
 namespace hooks {
@@ -38,4 +40,7 @@ namespace menu {
 	extern void Init();
 	extern int getDevMenu();
 	extern void AllocateConsole();
+	extern void SetDevMenuEnabled(bool enable);
+	extern void SetQuickMenuEnabled(bool enable);
+	extern void SetFavoritesMenuEnabled(bool enable);
 }
